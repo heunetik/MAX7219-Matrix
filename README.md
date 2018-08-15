@@ -23,7 +23,7 @@ ___
 let maxMatrix = require("max7219-matrix");
 
 let m = new maxMatrix.MAX7219Matrix("/dev/spidev0.0", 4);
-max7219.processText("TEST");
+m.processText("TEST");
 ```
 Run `node example/demo.js` to run the snippet from above
 --- The demo is set for 4 LED Arrays.
@@ -50,7 +50,7 @@ __**`processText(text, font)`**__
 * __`CP437_FONT` (default), `SINCLAIR_FONT`, `LCD_FONT`, `UKR_FONT` and `TINY_FONT`.__
 * Syntax :
 ```javascript
-max7219.processText("TEST", maxMatrix.LCD_FONT);
+m.processText("TEST", maxMatrix.LCD_FONT);
 ```
 ___
 ## Example
