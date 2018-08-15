@@ -1,0 +1,24 @@
+{
+  "name": "max7219-matrix",
+  "version": "0.0.1",
+  "description": "Interfacing with MAX7219 8x8 LED arrays for the Raspberry Pi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "max7219",
+    "led",
+    "led-array",
+    "8x8"
+  ],
+  "author": "heunetik",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/heunetik/MAX7219-Matrix.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "spi": "^0.2.0"
+  }
+}
