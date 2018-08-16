@@ -29,7 +29,7 @@ Run `node example/demo.js` to run the snippet from above
 --- The demo is set for 4 LED Arrays.
 
 * The displayed text will always be trimmed to the first N characters, where N is the number or screens specified in the constructor. ex.: 
-If we set the screen count to 4, and we send the text "HELLO" (`max7219.processText("APPLE");`), our screen will display `APPL`.
+If we set the screen count to 4, and we send the text "APPLE" (`max7219.processText("APPLE");`), our screen will display `APPL`.
 ___
 __**`maxMatrix.MAX7219Matrix(device, screenCount)`**__
 

@@ -60,6 +60,9 @@ MAX7219Matrix.prototype._initialize = function(sc) {
  * @param font The font in which the text should be displayed (defaults to CP437)
  */
 MAX7219Matrix.prototype.processText = function(text, font) {
+    if (typeof text === 'undefined' || !text) {
+        text = "    ";
+    }
     let fittedText = text.slice(0, this.screenCount).split("");
     let finalData = [];
     let asciiData = [];
