@@ -1,6 +1,6 @@
 {
   "name": "max7219-matrix",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Interfacing with MAX7219 8x8 LED arrays for the Raspberry Pi",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,8 @@
   },
   "keywords": [
     "max7219",
+    "matrix",
+    "raspberry",
     "led",
     "led-array",
     "8x8"

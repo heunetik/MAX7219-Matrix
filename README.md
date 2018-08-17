@@ -1,5 +1,12 @@
 # MAX7219-Matrix
+
+[![NpmVersion](https://img.shields.io/npm/v/max7219-matrix.svg)](https://www.npmjs.com/package/max7219-matrix)
+[![GitHub issues](https://img.shields.io/github/issues/heunetik/max7219-matrix.svg)](https://github.com/heunetik/MAX7219-Matrix/issues)
+[![npm](https://img.shields.io/npm/dw/max7219-matrix.svg)](https://www.npmjs.com/package/max7219-matrix)
+[![GitHub](https://img.shields.io/github/license/heunetik/max7219-matrix.svg)](https://github.com/heunetik/MAX7219-Matrix/blob/master/LICENSE)
+
 Interfacing with MAX7219 8x8 LED arrays for the Raspberry Pi over SPI
+___
 ## Install
 ``npm install max7219-matrix``
 ___
