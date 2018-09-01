@@ -54,16 +54,16 @@ __**`processText(text, font)`**__
 
 * Display the `text`, in the selected `font`. If the `font` is not specified, it defaults to `CP437_FONT`.
 * The following fonts can be used: 
-* __`CP437_FONT` (default), `SINCLAIR_FONT`, `LCD_FONT`, `UKR_FONT` and `TINY_FONT`.__
+* __`CP437_FONT`, `SINCLAIR_FONT`, `LCD_FONT`, `UKR_FONT`, `TINY_FONT`, `CP437_FONT_ROTATED` (default), `SINCLAIR_FONT_ROTATED` and `LCD_FONT_ROTATED`.__
 * Syntax :
 ```javascript
-m.processText("TEST", maxMatrix.LCD_FONT);
+m.processText("TEST", "SINCLAIR_FONT_ROTATED");
 ```
 ___
 ## Example
 
-The demo, found at `example/demo.js`, displays __" TEST "__ in the __CP437_FONT__.
-(it's set for 4 daisy-chained MAX7219 arrays)
+The demo, found at `example/demo.js`, displays __" TEST "__ in the __SINCLAIR_FONT_ROTATED__.
+(it's set for 4 daisy-chained MAX7219 matrices)
 ___
 ## TO-DOs
 
