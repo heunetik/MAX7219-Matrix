@@ -28,14 +28,14 @@ let initialized = false;
  * @param device The SPI port on which the MAX7219 controlled LED matrices are connected
  * @constructor
  */
-let MAX7219Matrix = function(device, screenCount) {
+let MAX7219Matrix = function (device, screenCount) {
     this._spi = new SPI.Spi(device, {
         "mode": SPI.MODE["MODE_0"],  // Mode should be the first one set
         "chipSelect": SPI.CS["low"] // "none", "high" - defaults to low
     },
-    function(s) {
-        s.open();
-    });
+        function (s) {
+            s.open();
+        });
 
     this._initialize(screenCount);
 }
@@ -44,8 +44,8 @@ let MAX7219Matrix = function(device, screenCount) {
  * Initializes the MAX7219 controlled LED matrices
  * @param sc Number of screens daisy-chained and connected
  */
-MAX7219Matrix.prototype._initialize = function(sc) {
-    if(typeof this._spi !=="undefined" && !initialized) {
+MAX7219Matrix.prototype._initialize = function (sc) {
+    if (typeof this._spi !== "undefined" && !initialized) {
         this.screenCount = sc ? sc : 1; // Set screen count, or default it to 1
         this._sendToAllMatrices(MAX7219_REG_SCANLIMIT, 7); // show all 8 digits
         this._sendToAllMatrices(MAX7219_REG_DECODEMODE, 0x0); // 0x0 Matrix - 0x1 Seven-Segment
@@ -61,9 +61,9 @@ MAX7219Matrix.prototype._initialize = function(sc) {
  * @param text The text to be displayed
  * @param font The font in which the text should be displayed (defaults to CP437)
  */
-MAX7219Matrix.prototype.processText = function(text, font) {
+MAX7219Matrix.prototype.processText = function (text, font) {
     if (typeof text === 'undefined' || !text) {
-        text = "    ";
+        text = Array(screenCount).fill(" ").join("");;
     }
     let fittedText = text.slice(0, this.screenCount).split("");
     let finalData = [];
@@ -82,6 +82,7 @@ MAX7219Matrix.prototype.processText = function(text, font) {
         this._writeToChip(col, finalData[i]);
         col++;
     }
+    return this;
 }
 
 /**
@@ -89,7 +90,7 @@ MAX7219Matrix.prototype.processText = function(text, font) {
  * @param register The register where the data should be written
  * @param data The data that should be written
  */
-MAX7219Matrix.prototype._writeToChip = function(register, data) {
+MAX7219Matrix.prototype._writeToChip = function (register, data) {
     let writableData = this._formatData(register, data);
     var buf = new Buffer(writableData);
     this._spi.write(buf);
@@ -103,7 +104,7 @@ MAX7219Matrix.prototype._writeToChip = function(register, data) {
  * @param register The register where the data should be written
  * @param data The data that should be formatted to the number of matrices
  */
-MAX7219Matrix.prototype._formatData = function(register, data) {
+MAX7219Matrix.prototype._formatData = function (register, data) {
     let finalData = [];
     for (let i = 0; i < this.screenCount; i++) {
         finalData.push(register);
@@ -117,7 +118,7 @@ MAX7219Matrix.prototype._formatData = function(register, data) {
  * @param register The register where the data should be written
  * @param data The data that should be written
  */
-MAX7219Matrix.prototype._sendToAllMatrices = function(reg, data) {
+MAX7219Matrix.prototype._sendToAllMatrices = function (reg, data) {
     this._writeToChip(reg, Array(this.screenCount).fill(data));
 }
 
@@ -125,18 +126,19 @@ MAX7219Matrix.prototype._sendToAllMatrices = function(reg, data) {
  * Sets the matrices' intensity (0 <= intensity <= 15)
  * @param intensity The matrices' intensity
  */
-MAX7219Matrix.prototype.setBrightness = function(brightness) {
+MAX7219Matrix.prototype.setBrightness = function (brightness) {
     if (brightness < 0 && brightness > 15) {
         throw `Brightness should be between 0 and 15. You set it to ${brightness}.`;
     }
     this._sendToAllMatrices(MAX7219_REG_INTENSITY, brightness);
+    return this;
 }
 
 /**
  * Returns a character's ASCII code
  * @param char The matrices' intensity
  */
-MAX7219Matrix.prototype._ascii = function(char) {
+MAX7219Matrix.prototype._ascii = function (char) {
     return char.charCodeAt(0);
 }
 
@@ -144,15 +146,15 @@ MAX7219Matrix.prototype._ascii = function(char) {
  * Returns the matrix, transposed (flipped over it's diagonal)
  * @param m The matrix to be transposed
  */
-MAX7219Matrix.prototype._transpose = function(m) {
-    return m[0].map((x,i) => m.map(x => x[i]));
+MAX7219Matrix.prototype._transpose = function (m) {
+    return m[0].map((x, i) => m.map(x => x[i]));
 }
 
 /**
  * Sleeps for the set amount of milliseconds
  * @param milliseconds Sleep duration, in milliseconds
  */
-MAX7219Matrix.prototype._sleep = function(milliseconds) {
+MAX7219Matrix.prototype._sleep = function (milliseconds) {
     let start = new Date().getTime();
     for (let i = 0; i < 1e7; i++) {
         if ((new Date().getTime() - start) > milliseconds) {
