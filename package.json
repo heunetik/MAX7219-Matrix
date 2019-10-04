@@ -1,6 +1,6 @@
 {
   "name": "max7219-matrix",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Interfacing with MAX7219 8x8 LED arrays for the Raspberry Pi",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,6 @@
   },
   "license": "ISC",
   "dependencies": {
-    "spi": "^0.2.0"
+    "spi-device": "2.0.8"
   }
 }
