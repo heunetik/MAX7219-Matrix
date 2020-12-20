@@ -86,7 +86,6 @@ MAX7219Matrix.prototype.processText = function (text, font) {
  * Initializes the matrices
  */
 MAX7219Matrix.prototype._initialize = function () {
-    this._sendToAllMatrices(MAX7219_REG_SCANLIMIT, 7); // show all 8 digits
     this._sendToAllMatrices(MAX7219_REG_DECODEMODE, 0x0); // 0x0 Matrix - 0x1 Seven-Segment
     this._sendToAllMatrices(MAX7219_REG_DISPLAYTEST, 0x0); // not a display test
     this._sendToAllMatrices(MAX7219_REG_SHUTDOWN, 0x1); // not shutdown mode
@@ -110,11 +109,11 @@ MAX7219Matrix.prototype._writeToChip = function (register, data) {
     let writableData = this._formatData(register, data);
     const message = [{
         sendBuffer: Buffer.from(writableData),
-        byteLength: 8,
+        byteLength: writableData.length,
         speedHz: 20000
     }];
     this.max7219.then((max) => {
-        max.transferSync(message, (error, message) => {
+        max.transfer(message, (error, message) => {
             if (error) {
                 console.log(`Error occurred while transferring the data: ${error}`);
             }
