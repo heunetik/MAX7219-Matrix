@@ -1,8 +1,7 @@
-"use strict";
+'use strict';
 
-let SPI = require("spi-device");
-const fonts = require("./fonts.js");
-const DEFAULT_FONT = fonts.DEFAULT_FONT;
+let SPI = require('spi-device');
+const fonts = require('./fonts.js');
 
 const MAX7219_REG_DECODEMODE = 0x9;
 const MAX7219_REG_INTENSITY = 0xA;
@@ -10,7 +9,6 @@ const MAX7219_REG_SCANLIMIT = 0xB;
 const MAX7219_REG_SHUTDOWN = 0xC;
 const MAX7219_REG_DISPLAYTEST = 0xF;
 
-const NUM_DIGITS = 8;
 const MAX7219_REG_DIGIT0 = 0x1;
 const MAX7219_REG_DIGIT1 = 0x2;
 const MAX7219_REG_DIGIT2 = 0x3;
@@ -28,16 +26,16 @@ const MAX7219_REG_DIGIT7 = 0x8;
  * @constructor
  */
 let MAX7219Matrix = function (bus, device, screenCount) {
-    this.screenCount = screenCount || 1;
-    this.max7219 = new Promise((resolve, reject) => {
-        const spiObject = SPI.open(bus, device, (err) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(spiObject);
-        });
+  this.screenCount = screenCount || 1;
+  this.max7219 = new Promise((resolve, reject) => {
+    const spiObject = SPI.open(bus, device, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(spiObject);
     });
-    this._initialize();
+  });
+  this._initialize();
 }
 
 /**
@@ -45,12 +43,12 @@ let MAX7219Matrix = function (bus, device, screenCount) {
  * @param intensity The matrices' light intensity
  */
 MAX7219Matrix.prototype.setBrightness = function (brightness) {
-    if (brightness < 0 && brightness > 15) {
-        console.log(`Brightness should be between 0 and 15. You set it to ${brightness}.`);
-        return this;
-    }
-    this._sendToAllMatrices(MAX7219_REG_INTENSITY, brightness);
+  if (brightness < 0 && brightness > 15) {
+    console.log(`Brightness should be between 0 and 15. You set it to ${brightness}.`);
     return this;
+  }
+  this._sendToAllMatrices(MAX7219_REG_INTENSITY, brightness);
+  return this;
 }
 
 /**
@@ -59,36 +57,38 @@ MAX7219Matrix.prototype.setBrightness = function (brightness) {
  * @param font The font in which the text should be displayed (defaults to CP437)
  */
 MAX7219Matrix.prototype.processText = function (text, font) {
-    if (typeof text === 'undefined' || !text) {
-        text = Array(screenCount).fill(" ").join("");;
-    }
-    let fittedText = text.slice(0, this.screenCount).split("");
-    let finalData = [];
-    let asciiData = [];
-    if (typeof font === "undefined" || !fonts.hasOwnProperty(font)) {
-        font = fonts.CP437_FONT_ROTATED;
-    } else {
-        font = fonts[font];
-    }
-    for (let char of fittedText) {
-        asciiData.push(font[this._ascii(char)]);
-    }
-    finalData = this._transpose(asciiData);
-    let col = MAX7219_REG_DIGIT0;
-    for (let i = 0; i < 8; i++) {
-        this._writeToChip(col, finalData[i]);
-        col++;
-    }
-    return this;
+  if (typeof text === 'undefined' || !text) {
+    text = ' '.repeat(this.screenCount);
+  }
+
+  if (typeof font === 'undefined' || !fonts.hasOwnProperty(font)) {
+    font = fonts.DEFAULT_FONT
+  } else {
+    font = fonts[font];
+  }
+
+  const fittedText = text.slice(0, this.screenCount).split('');
+  const asciiData = [];
+  for (let char of fittedText) {
+    asciiData.push(font[this._ascii(char)]);
+  }
+
+  const finalData = this._transpose(asciiData);
+  let col = MAX7219_REG_DIGIT0;
+  for (let i = 0; i < 8; i++) {
+    this._writeToChip(col, finalData[i]);
+    col++;
+  }
+  return this;
 }
 
 /**
  * Initializes the matrices
  */
 MAX7219Matrix.prototype._initialize = function () {
-    this._sendToAllMatrices(MAX7219_REG_DECODEMODE, 0x0); // 0x0 Matrix - 0x1 Seven-Segment
-    this._sendToAllMatrices(MAX7219_REG_DISPLAYTEST, 0x0); // not a display test
-    this._sendToAllMatrices(MAX7219_REG_SHUTDOWN, 0x1); // not shutdown mode
+  this._sendToAllMatrices(MAX7219_REG_DECODEMODE, 0x0); // 0x0 Matrix - 0x1 Seven-Segment
+  this._sendToAllMatrices(MAX7219_REG_DISPLAYTEST, 0x0); // not a display test
+  this._sendToAllMatrices(MAX7219_REG_SHUTDOWN, 0x1); // not shutdown mode
 }
 
 /**
@@ -97,7 +97,7 @@ MAX7219Matrix.prototype._initialize = function () {
  * @param data The data that should be written
  */
 MAX7219Matrix.prototype._sendToAllMatrices = function (reg, data) {
-    this._writeToChip(reg, Array(this.screenCount).fill(data));
+  this._writeToChip(reg, Array(this.screenCount).fill(data));
 }
 
 /**
@@ -106,22 +106,21 @@ MAX7219Matrix.prototype._sendToAllMatrices = function (reg, data) {
  * @param data The data that should be written
  */
 MAX7219Matrix.prototype._writeToChip = function (register, data) {
-    let writableData = this._formatData(register, data);
-    const message = [{
-        sendBuffer: Buffer.from(writableData),
-        byteLength: writableData.length,
-        speedHz: 20000
-    }];
-    this.max7219.then((max) => {
-        max.transfer(message, (error, message) => {
-            if (error) {
-                console.log(`Error occurred while transferring the data: ${error}`);
-            }
-        });
-    },
-    (err) => {
-        console.log(`Error occurred while connecting through SPI: ${err}`);
+  const writableData = this._formatData(register, data);
+  const message = [{
+    sendBuffer: Buffer.from(writableData),
+    byteLength: writableData.length,
+    speedHz: 20000
+  }];
+  this.max7219.then((max) => {
+    max.transfer(message, (error, message) => {
+      if (error) {
+        console.log(`Error occurred while transferring the data: ${error}`);
+      }
     });
+  },
+    err => console.log(`Error occurred while connecting through SPI: ${err}`)
+  );
 }
 
 /**
@@ -133,12 +132,11 @@ MAX7219Matrix.prototype._writeToChip = function (register, data) {
  * @param data The data that should be formatted to the number of matrices
  */
 MAX7219Matrix.prototype._formatData = function (register, data) {
-    let finalData = [];
-    for (let i = 0; i < this.screenCount; i++) {
-        finalData.push(register);
-        finalData.push(data.pop());
-    }
-    return finalData;
+  const finalData = [];
+  for (let i = 0; i < this.screenCount; i++) {
+    finalData.push(register, data.pop());
+  }
+  return finalData;
 }
 
 /**
@@ -146,7 +144,7 @@ MAX7219Matrix.prototype._formatData = function (register, data) {
  * @param char The characacter of which the ASCII code will be returned
  */
 MAX7219Matrix.prototype._ascii = function (char) {
-    return char.charCodeAt(0);
+  return char.charCodeAt(0);
 }
 
 /**
@@ -154,7 +152,7 @@ MAX7219Matrix.prototype._ascii = function (char) {
  * @param m The matrix to be transposed
  */
 MAX7219Matrix.prototype._transpose = function (m) {
-    return m[0].map((x, i) => m.map(x => x[i]));
+  return m[0].map((x, i) => m.map(x => x[i]));
 }
 
 module.exports.MAX7219Matrix = MAX7219Matrix;
