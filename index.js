@@ -68,9 +68,13 @@ MAX7219Matrix.prototype.processText = function (text, font) {
   }
 
   const fittedText = text.slice(0, this.screenCount).split('');
-  const asciiData = [];
+  let asciiData = [];
   for (let char of fittedText) {
     asciiData.push(font[this._ascii(char)]);
+  }
+
+  if (this.rotation) {
+    asciiData = this._rotate90clockwise(asciiData);
   }
 
   const finalData = this._transpose(asciiData);
@@ -86,6 +90,7 @@ MAX7219Matrix.prototype.processText = function (text, font) {
  * Initializes the matrices
  */
 MAX7219Matrix.prototype._initialize = function () {
+  this._sendToAllMatrices(MAX7219_REG_SCANLIMIT, 7); // show all 8 digits
   this._sendToAllMatrices(MAX7219_REG_DECODEMODE, 0x0); // 0x0 Matrix - 0x1 Seven-Segment
   this._sendToAllMatrices(MAX7219_REG_DISPLAYTEST, 0x0); // not a display test
   this._sendToAllMatrices(MAX7219_REG_SHUTDOWN, 0x1); // not shutdown mode
@@ -153,6 +158,27 @@ MAX7219Matrix.prototype._ascii = function (char) {
  */
 MAX7219Matrix.prototype._transpose = function (m) {
   return m[0].map((x, i) => m.map(x => x[i]));
+}
+
+MAX7219Matrix.prototype.setRotation = function(rot) {
+  this.rotation = rot;
+  return this;
+}
+
+MAX7219Matrix.prototype._rotate90clockwise = function (m) {
+  return m.map(e => {
+    let result = this._hexToByteArray(e);
+    result = this._transpose(result).map(r => r.reverse());
+    return this._byteArrayToHex(result);
+  });
+}
+
+MAX7219Matrix.prototype._hexToByteArray = function (hex) {
+  return hex.map(h => h.toString(2).padStart(hex.length, '0').split(''));
+}
+
+MAX7219Matrix.prototype._byteArrayToHex = function (byteArray) {
+  return byteArray.map(b => parseInt(b.join(''), 2));
 }
 
 module.exports.MAX7219Matrix = MAX7219Matrix;
